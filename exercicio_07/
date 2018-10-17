@@ -1,0 +1,38 @@
+pragma solidity ^0.4.25;
+
+import "./MessageContract.sol";
+import "./Ownable.sol";
+
+contract MessageOwnableContract is MessageContract, Ownable{
+    
+    address[] public ownerList;
+    uint256 constant MAX_OWNER = 4;
+
+    constructor (string initialMessage) public
+        MessageContract(initialMessage)
+    {
+        //// 
+    }    
+    
+    // sobrecarga de método
+    function setMessage(string newMessage) public onlyOwner{
+        MessageContract.setMessage(newMessage);
+    } 
+    
+    function addOwner(address newOwner) public onlyOwner {
+        require(ownerList.length < MAX_OWNER, "Limite de owner excedido!");
+        ownerList[ownerList.length] = newOwner;
+    }
+    
+    modifier onlyOwner(){
+        bool isOwner = false;
+        for(uint index ;index <= MAX_OWNER; index++ ){
+            if (msg.sender ==  ownerList[index]){
+                isOwner = true;
+                break;
+            }
+        }
+        require(isOwner, "Somente owner");
+        _;
+    }
+}
